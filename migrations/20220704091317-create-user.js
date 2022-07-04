@@ -9,19 +9,34 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        type: Sequelize.STRING
       },
       email: {
-        type: Sequelize.STRING,
-        unique: true
+        type: Sequelize.STRING
       },
-      phone: {
+      telephone: {
         type: Sequelize.INTEGER
       },
       password: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        type: Sequelize.STRING
+      },
+      aboutMe: {
+        type: Sequelize.STRING
+      },
+      imageUrl: {
+        type: Sequelize.STRING
+      },
+      latitude: {
+        type: Sequelize.INTEGER
+      },
+      longitude: {
+        type: Sequelize.INTEGER
+      },
+      credits: {
+        type: Sequelize.INTEGER
+      },
+      blockedCredits: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
