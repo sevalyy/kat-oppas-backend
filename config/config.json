@@ -1,20 +1,38 @@
 {
   "development": {
-    "url": "postgres://bldwkkyl:eA2mS7s2Y08jxqYaCMKvvofIA9aNX6HW@tai.db.elephantsql.com/bldwkkyl",
-    "dialect": "postgres"
+    "url": "postgres://dqkcneno:lAK7A8bvJdji_jk_fwV03sWcHulTgrUQ@abul.db.elephantsql.com/dqkcneno",
+    "dialect": "postgres",
+    "pool": {
+      "max": 2,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
   },
   "test": {
     "username": "root",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "pool": {
+      "max": 1,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
   },
   "production": {
     "username": "root",
     "password": null,
     "database": "database_production",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "pool": {
+      "max": 1,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
   }
 }

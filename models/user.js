@@ -3,13 +3,26 @@ const { Model } = require("sequelize");
 const reservation = require("./reservation");
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      user.hasMany(models.reservation);
+      // user.hasMany(models.reservation);
+      // user.hasMany(models.transaction);
+      user.hasMany(models.reservation, {
+        foreignKey: "providerUserId",
+        as: "provider",
+      });
+      user.hasMany(models.reservation, {
+        foreignKey: "requesterUserId",
+        as: "requester",
+      });
+
+      user.hasMany(models.transaction, {
+        foreignKey: "toUserId",
+        as: "toUser",
+      });
+      user.hasMany(models.transaction, {
+        foreignKey: "fromUserId",
+        as: "fromUser",
+      });
     }
   }
   user.init(
@@ -20,8 +33,8 @@ module.exports = (sequelize, DataTypes) => {
       password: { type: DataTypes.STRING, allowNull: false },
       aboutMe: { type: DataTypes.STRING, allowNull: false },
       imageUrl: { type: DataTypes.STRING, allowNull: false },
-      latitude: { type: DataTypes.INTEGER, allowNull: false },
-      longitude: { type: DataTypes.INTEGER, allowNull: false },
+      latitude: { type: DataTypes.DOUBLE, allowNull: false },
+      longitude: { type: DataTypes.DOUBLE, allowNull: false },
       credits: DataTypes.INTEGER,
       blockedCredits: DataTypes.INTEGER,
     },

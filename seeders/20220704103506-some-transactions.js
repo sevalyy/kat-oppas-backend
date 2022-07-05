@@ -12,6 +12,8 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           reservationId: 1,
+          fromUserId: 1,
+          toUserId: 2,
         },
         {
           reason: "10 days oppas",
@@ -20,6 +22,8 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           reservationId: 2,
+          fromUserId: 3,
+          toUserId: 1,
         },
         {
           reason: "5 days oppas",
@@ -28,6 +32,8 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           reservationId: 3,
+          fromUserId: 2,
+          toUserId: 3,
         },
       ],
       {}
