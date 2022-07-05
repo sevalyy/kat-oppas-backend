@@ -15,10 +15,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   reservation.init(
     {
-      startDate: DataTypes.DATEONLY,
-      endDate: DataTypes.DATEONLY,
-      description: DataTypes.STRING,
+      startDate: { type: DataTypes.DATEONLY, allowNull: false },
+      endDate: { type: DataTypes.DATEONLY, allowNull: false },
+      description: { type: DataTypes.STRING, allowNull: false },
       status: DataTypes.INTEGER,
+      latitude: { type: DataTypes.DOUBLE, allowNull: false },
+      longitude: { type: DataTypes.DOUBLE, allowNull: false },
     },
     {
       sequelize,

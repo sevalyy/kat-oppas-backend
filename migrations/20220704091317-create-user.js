@@ -26,12 +26,7 @@ module.exports = {
       imageUrl: {
         type: Sequelize.STRING,
       },
-      latitude: {
-        type: Sequelize.DOUBLE,
-      },
-      longitude: {
-        type: Sequelize.DOUBLE,
-      },
+
       credits: {
         type: Sequelize.INTEGER,
       },

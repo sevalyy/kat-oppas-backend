@@ -33,8 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       password: { type: DataTypes.STRING, allowNull: false },
       aboutMe: { type: DataTypes.STRING, allowNull: false },
       imageUrl: { type: DataTypes.STRING, allowNull: false },
-      latitude: { type: DataTypes.DOUBLE, allowNull: false },
-      longitude: { type: DataTypes.DOUBLE, allowNull: false },
+
       credits: DataTypes.INTEGER,
       blockedCredits: DataTypes.INTEGER,
     },

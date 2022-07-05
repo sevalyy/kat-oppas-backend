@@ -14,8 +14,7 @@ module.exports = {
           updatedAt: new Date(),
           aboutMe: "",
           imageUrl: "",
-          latitude: 52.34,
-          longitude: 4.86,
+
           credits: 5,
           blockedCredits: 0,
         },
@@ -28,8 +27,7 @@ module.exports = {
           updatedAt: new Date(),
           aboutMe: "",
           imageUrl: "",
-          latitude: 52.35,
-          longitude: 4.87,
+
           credits: 5,
           blockedCredits: 0,
         },
@@ -42,8 +40,7 @@ module.exports = {
           updatedAt: new Date(),
           aboutMe: "",
           imageUrl: "",
-          latitude: 52.35,
-          longitude: 4.88,
+
           credits: 5,
           blockedCredits: 0,
         },

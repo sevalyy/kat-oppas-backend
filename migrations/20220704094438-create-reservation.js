@@ -23,6 +23,12 @@ module.exports = {
       status: {
         type: Sequelize.INTEGER,
       },
+      latitude: {
+        type: Sequelize.DOUBLE,
+      },
+      longitude: {
+        type: Sequelize.DOUBLE,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
