@@ -7,7 +7,7 @@ const Transaction = require("../models").transaction;
 router.get("/", async (req, res, next) => {
   try {
     const reservations = await Reservation.findAll({
-      include: [User, Transaction],
+      // include: [User, Transaction],
     });
     res.send(reservations);
   } catch (e) {
@@ -28,3 +28,5 @@ router.get("/:id", async (req, res, next) => {
     next(e);
   }
 });
+
+module.exports = router;

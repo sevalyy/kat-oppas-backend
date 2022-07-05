@@ -4,8 +4,8 @@ const reservation = require("./reservation");
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     static associate(models) {
-      // user.hasMany(models.reservation);
-      // user.hasMany(models.transaction);
+      //  user.hasMany(models.reservation);
+      //  user.hasMany(models.transaction);
       user.hasMany(models.reservation, {
         foreignKey: "providerUserId",
         as: "provider",
