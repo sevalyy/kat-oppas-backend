@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
       transaction.belongsTo(models.reservation, {
         foreignKey: "reservationId",
       });
-      transaction.hasOne(models.user, { foreignKey: "fromUserId" });
-      transaction.hasOne(models.user, { foreignKey: "toUserId" });
+      // not ok // transaction.hasOne(models.user, { foreignKey: "fromUserId" });
+      // not ok // transaction.hasOne(models.user, { foreignKey: "toUserId" });
     }
   }
   transaction.init(

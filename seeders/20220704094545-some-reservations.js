@@ -12,6 +12,8 @@ module.exports = {
           status: 1,
           latitude: 52.34,
           longitude: 4.86,
+          imageUrl: "https://cataas.com/cat?width=300",
+
           createdAt: new Date(),
           updatedAt: new Date(),
           requesterUserId: 1,
@@ -24,6 +26,8 @@ module.exports = {
           status: 2,
           latitude: 52.35,
           longitude: 4.87,
+          imageUrl: "https://cataas.com/cat?width=300",
+
           createdAt: new Date(),
           updatedAt: new Date(),
           requesterUserId: 3,
@@ -37,6 +41,8 @@ module.exports = {
           status: 1,
           latitude: 52.35,
           longitude: 4.88,
+          imageUrl: "https://cataas.com/cat?width=300",
+
           createdAt: new Date(),
           updatedAt: new Date(),
           requesterUserId: 2,

@@ -8,8 +8,14 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      reservation.belongsTo(models.user, { foreignKey: "requesterUserId" });
-      reservation.belongsTo(models.user, { foreignKey: "providerUserId" });
+      reservation.belongsTo(models.user, {
+        foreignKey: "requesterUserId",
+        as: "requester",
+      });
+      reservation.belongsTo(models.user, {
+        foreignKey: "providerUserId",
+        as: "provider",
+      });
       reservation.hasOne(models.transaction);
     }
   }
@@ -21,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       status: DataTypes.INTEGER,
       latitude: { type: DataTypes.DOUBLE, allowNull: false },
       longitude: { type: DataTypes.DOUBLE, allowNull: false },
+      imageUrl: { type: DataTypes.STRING, allowNull: false },
     },
     {
       sequelize,

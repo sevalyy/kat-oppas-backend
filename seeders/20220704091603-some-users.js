@@ -13,7 +13,6 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           aboutMe: "",
-          imageUrl: "",
 
           credits: 5,
           blockedCredits: 0,
@@ -26,7 +25,6 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           aboutMe: "",
-          imageUrl: "",
 
           credits: 5,
           blockedCredits: 0,
@@ -39,7 +37,6 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           aboutMe: "",
-          imageUrl: "",
 
           credits: 5,
           blockedCredits: 0,

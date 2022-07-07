@@ -23,9 +23,6 @@ module.exports = {
       aboutMe: {
         type: Sequelize.STRING,
       },
-      imageUrl: {
-        type: Sequelize.STRING,
-      },
 
       credits: {
         type: Sequelize.INTEGER,
