@@ -3,6 +3,7 @@ const router = new Router();
 const User = require("../models/").user;
 const Reservation = require("../models/").reservation;
 const Transaction = require("../models").transaction;
+const authMiddleware = require("../auth/middleware");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -10,7 +11,7 @@ router.get("/", async (req, res, next) => {
       // include: [User, Transaction],
       include: [
         { model: User, association: "requester" },
-        // also ok { model: User, association: "provider" },
+        { model: User, association: "provider" },
       ],
     });
     res.send(reservations);
@@ -38,15 +39,17 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // new reservation post /reservations
-router.post("/", async (req, res, next) => {
+router.post("/", authMiddleware, async (req, res, next) => {
   try {
-    //   const user = req.user;
+    const user = req.user;
+    console.log("requester ", user);
 
-    //   if (!user) {
-    //     return res.status(401).send("You need to login");
-    //   }
+    if (!user) {
+      return res.status(401).send("You need to login");
+    }
 
-    //   const userId = user.id;
+    const requesterUserId = parseInt(user.id);
+    console.log("requester id ", requesterUserId);
 
     const { startDate, endDate, description, longitude, latitude, imageUrl } =
       req.body;
@@ -57,6 +60,7 @@ router.post("/", async (req, res, next) => {
       longitude,
       latitude,
       imageUrl,
+      requesterUserId,
     };
 
     await Reservation.create(newReservation);

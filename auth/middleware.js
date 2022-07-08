@@ -6,9 +6,11 @@ async function auth(req, res, next) {
     req.headers.authorization && req.headers.authorization.split(" ");
 
   if (!auth || !(auth[0] === "Bearer") || !auth[1]) {
+    console.log("Auth error: Authentication token not found!");
+
     return res.status(401).send({
       message:
-        "This endpoint requires an Authorization header with a valid token"
+        "This endpoint requires an Authorization header with a valid token",
     });
   }
 
@@ -16,6 +18,7 @@ async function auth(req, res, next) {
     const data = toData(auth[1]);
     const user = await User.findByPk(data.userId);
     if (!user) {
+      console.log("Auth error: User not found!");
       return res.status(404).send({ message: "User does not exist" });
     }
 
@@ -24,7 +27,7 @@ async function auth(req, res, next) {
     // next handler
     return next();
   } catch (error) {
-    console.log("ERROR IN AUTH MIDDLEWARE", error);
+    console.log("Auth error: ", error);
 
     switch (error.name) {
       case "TokenExpiredError":
@@ -39,7 +42,7 @@ async function auth(req, res, next) {
 
       default:
         return res.status(400).send({
-          message: "Something went wrong, sorry"
+          message: "Something went wrong, sorry",
         });
     }
   }

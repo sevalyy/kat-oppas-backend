@@ -7,8 +7,7 @@ const { SALT_ROUNDS } = require("../config/constants");
 
 const router = new Router();
 
-
-//login 
+//login
 router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -36,11 +35,10 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-
 //signup
 router.post("/signup", async (req, res) => {
-  const { email, password, name } = req.body;
-  if (!email || !password || !name) {
+  const { email, password, name, aboutMe, telephone } = req.body;
+  if (!email || !password || !name || !aboutMe || !telephone) {
     return res.status(400).send("Please provide an email, password and a name");
   }
 
@@ -49,6 +47,10 @@ router.post("/signup", async (req, res) => {
       email,
       password: bcrypt.hashSync(password, SALT_ROUNDS),
       name,
+      aboutMe,
+      telephone,
+      credits: 5,
+      blockedCredits: 0,
     });
 
     delete newUser.dataValues["password"]; // don't send back the password hash
@@ -62,8 +64,8 @@ router.post("/signup", async (req, res) => {
         .status(400)
         .send({ message: "There is an existing account with this email" });
     }
-
-    return res.status(400).send({ message: "Something went wrong, sorry" });
+    console.log(error);
+    return res.status(500).send({ message: "Something went wrong, sorry" });
   }
 });
 
