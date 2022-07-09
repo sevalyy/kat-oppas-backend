@@ -4,7 +4,7 @@ const User = require("../models/").user;
 const Reservation = require("../models/").reservation;
 const Transaction = require("../models").transaction;
 const authMiddleware = require("../auth/middleware");
-
+const { Op } = require("sequelize");
 router.get("/", async (req, res, next) => {
   try {
     const reservations = await Reservation.findAll({
@@ -13,6 +13,47 @@ router.get("/", async (req, res, next) => {
         { model: User, association: "requester" },
         { model: User, association: "provider" },
       ],
+    });
+    res.send(reservations);
+  } catch (e) {
+    console.log(e.message);
+    next(e);
+  }
+});
+
+router.get("/mine", authMiddleware, async (req, res, next) => {
+  console.log("In mine reservations");
+  const user = req.user;
+  console.log("requester ", user);
+
+  if (!user) {
+    return res.status(401).send("You need to login");
+  }
+
+  const requesterUserId = parseInt(user.id);
+  console.log("requester id ", requesterUserId);
+
+  try {
+    const reservations = await Reservation.findAll({
+      // include: [User, Transaction],
+      include: [
+        { model: User, association: "requester" },
+        { model: User, association: "provider" },
+      ],
+      where: {
+        [Op.or]: [
+          {
+            requesterUserId: {
+              [Op.eq]: requesterUserId,
+            },
+          },
+          {
+            providerUserId: {
+              [Op.eq]: requesterUserId,
+            },
+          },
+        ],
+      },
     });
     res.send(reservations);
   } catch (e) {
@@ -72,6 +113,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
       longitude,
       latitude,
       imageUrl,
+      status: 0,
       requesterUserId,
     };
 
@@ -84,7 +126,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
   }
 });
 
-// for  reservation accepting, use this endpoint
+// for reservation accepting
 router.post("/:id/accept", authMiddleware, async (req, res, next) => {
   try {
     const user = req.user;
@@ -94,7 +136,7 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
       return res.status(401).send("You need to login");
     }
 
-    const providerUserId = parseInt(user.id);
+    const providerUserId = user.id;
     console.log("provider id ", providerUserId);
 
     const reservationId = req.params.id;
@@ -105,7 +147,8 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
     }
     // update reservation by accepting button
     const result = await Reservation.update(
-      { providerUserId: providerUserId },
+      // update 2 fields at the same time
+      { providerUserId: providerUserId, status: 1 },
       { where: { id: reservationId } }
     );
 
