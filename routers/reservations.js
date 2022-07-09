@@ -53,6 +53,18 @@ router.post("/", authMiddleware, async (req, res, next) => {
 
     const { startDate, endDate, description, longitude, latitude, imageUrl } =
       req.body;
+    if (!startDate || !endDate || !description || !imageUrl) {
+      console.log(
+        "Please provide a description, an image, a start and end date"
+      );
+      return res
+        .status(400)
+        .send("Please provide a description, an image, a start and end date");
+    }
+    if (!latitude || !longitude) {
+      console.log("Please find your location on the map");
+      return res.status(400).send("Please find your location on the map");
+    }
     const newReservation = {
       startDate,
       endDate,
@@ -68,6 +80,38 @@ router.post("/", authMiddleware, async (req, res, next) => {
     res.send(newReservation);
   } catch (e) {
     console.log("Error for new rez. :", e.message);
+    next(e);
+  }
+});
+
+// for  reservation accepting, use this endpoint
+router.post("/:id/accept", authMiddleware, async (req, res, next) => {
+  try {
+    const user = req.user;
+    console.log("provider ", user);
+
+    if (!user) {
+      return res.status(401).send("You need to login");
+    }
+
+    const providerUserId = parseInt(user.id);
+    console.log("provider id ", providerUserId);
+
+    const reservationId = req.params.id;
+    const reservation = await Reservation.findByPk(reservationId);
+
+    if (reservation.providerUserId) {
+      return res.status(400).send("This reservation is already accepted");
+    }
+    // update reservation by accepting button
+    const result = await Reservation.update(
+      { providerUserId: providerUserId },
+      { where: { id: reservationId } }
+    );
+
+    res.send(result);
+  } catch (e) {
+    console.log(e.message);
     next(e);
   }
 });
