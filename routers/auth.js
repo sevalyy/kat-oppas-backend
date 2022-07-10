@@ -68,6 +68,33 @@ router.post("/signup", async (req, res) => {
     return res.status(500).send({ message: "Something went wrong, sorry" });
   }
 });
+// update user info
+router.post("/me", authMiddleware, async (req, res, next) => {
+  try {
+    const user = req.user;
+    console.log("user for updating ", user);
+
+    if (!user) {
+      return res.status(401).send("You need to login");
+    }
+    const userId = user.id;
+
+    const { name, aboutMe, telephone } = req.body;
+
+    const newUserInfos = {
+      name,
+      aboutMe,
+      telephone,
+    };
+
+    await User.update({ name, aboutMe, telephone });
+    console.log("updated user infos", newUserInfos);
+    res.send(newUserInfos);
+  } catch (e) {
+    console.log("Error for updated user infos :", e.message);
+    next(e);
+  }
+});
 
 // The /me endpoint can be used to:
 // - get the users email & name using only their token

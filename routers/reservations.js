@@ -30,7 +30,7 @@ router.get("/mine", authMiddleware, async (req, res, next) => {
     return res.status(401).send("You need to login");
   }
 
-  const requesterUserId = parseInt(user.id);
+  const requesterUserId = user.id;
   console.log("requester id ", requesterUserId);
 
   try {
@@ -40,6 +40,7 @@ router.get("/mine", authMiddleware, async (req, res, next) => {
         { model: User, association: "requester" },
         { model: User, association: "provider" },
       ],
+      //get the reservations that belong to this user as provider or requester
       where: {
         [Op.or]: [
           {
@@ -158,4 +159,5 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
     next(e);
   }
 });
+
 module.exports = router;
