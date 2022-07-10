@@ -87,9 +87,19 @@ router.post("/me", authMiddleware, async (req, res, next) => {
       telephone,
     };
 
-    await User.update({ name, aboutMe, telephone });
-    console.log("updated user infos", newUserInfos);
-    res.send(newUserInfos);
+    await User.update(
+      { name, aboutMe, telephone },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+
+    const updatedUser = await User.findOne({ where: { id: userId } });
+    console.log("updated user infos", updatedUser);
+    delete updatedUser.dataValues["password"]; //?why dataValues
+    res.status(200).send({ ...updatedUser.dataValues });
   } catch (e) {
     console.log("Error for updated user infos :", e.message);
     next(e);

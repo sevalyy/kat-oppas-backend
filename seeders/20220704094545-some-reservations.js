@@ -1,5 +1,5 @@
 "use strict";
-
+const { REV_STATUS_CREATED } = require("../config/constants");
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
@@ -9,7 +9,7 @@ module.exports = {
           startDate: "2022-08-17",
           endDate: "2022-08-19",
           description: "for my lovely cat, I'm looking for a host for 2 days",
-          status: 0,
+          status: REV_STATUS_CREATED,
           latitude: 52.34,
           longitude: 4.86,
           imageUrl: "https://cataas.com/cat?width=300",
@@ -23,7 +23,7 @@ module.exports = {
           startDate: "2022-07-17",
           endDate: "2022-07-27",
           description: "is there somebody to take care of my cat for 10 days",
-          status: 0,
+          status: REV_STATUS_CREATED,
           latitude: 52.35,
           longitude: 4.87,
           imageUrl: "https://cataas.com/cat?width=300",
@@ -38,7 +38,7 @@ module.exports = {
           endDate: "2022-08-15",
           description:
             "my cat has fooding and water device. he just needs some cuddle",
-          status: 0,
+          status: REV_STATUS_CREATED,
           latitude: 52.35,
           longitude: 4.88,
           imageUrl: "https://cataas.com/cat?width=300",

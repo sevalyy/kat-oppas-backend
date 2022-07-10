@@ -5,6 +5,11 @@ const Reservation = require("../models/").reservation;
 const Transaction = require("../models").transaction;
 const authMiddleware = require("../auth/middleware");
 const { Op } = require("sequelize");
+const {
+  REV_STATUS_CREATED,
+  REV_STATUS_ACCEPTED,
+} = require("../config/constants");
+
 router.get("/", async (req, res, next) => {
   try {
     const reservations = await Reservation.findAll({
@@ -13,6 +18,9 @@ router.get("/", async (req, res, next) => {
         { model: User, association: "requester" },
         { model: User, association: "provider" },
       ],
+      where: {
+        status: REV_STATUS_CREATED,
+      },
     });
     res.send(reservations);
   } catch (e) {
@@ -114,7 +122,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
       longitude,
       latitude,
       imageUrl,
-      status: 0,
+      status: REV_STATUS_CREATED,
       requesterUserId,
     };
 
@@ -143,13 +151,13 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
     const reservationId = req.params.id;
     const reservation = await Reservation.findByPk(reservationId);
 
-    if (reservation.providerUserId) {
+    if (reservation.status !== REV_STATUS_CREATED) {
       return res.status(400).send("This reservation is already accepted");
     }
     // update reservation by accepting button
     const result = await Reservation.update(
       // update 2 fields at the same time
-      { providerUserId: providerUserId, status: 1 },
+      { providerUserId: providerUserId, status: REV_STATUS_ACCEPTED },
       { where: { id: reservationId } }
     );
 
