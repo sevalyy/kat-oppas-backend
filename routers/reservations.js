@@ -5,6 +5,7 @@ const Reservation = require("../models/").reservation;
 const Transaction = require("../models").transaction;
 const authMiddleware = require("../auth/middleware");
 const { Op } = require("sequelize");
+
 const {
   REV_STATUS_CREATED,
   REV_STATUS_ACCEPTED,
@@ -141,14 +142,15 @@ router.post("/", authMiddleware, async (req, res, next) => {
     }
 
     const creditsNeeded = calculateCredits(startDate, endDate);
-    if (user.credits < creditsNeeded) {
+    const availableCredits = user.credits - user.blockedCredits;
+    if (availableCredits < creditsNeeded) {
       console.log(
-        `User tried to spend ${creditsNeeded} but has only ${user.credits}.`
+        `User tried to spend ${creditsNeeded} but has only ${availableCredits}.`
       );
       return res.status(400).send("Your credits are not enough.");
     } else {
       console.log(
-        `User will  spend ${creditsNeeded} from ${user.credits} credits.`
+        `User will  spend ${creditsNeeded} from ${availableCredits} credits.`
       );
     }
 
@@ -163,8 +165,16 @@ router.post("/", authMiddleware, async (req, res, next) => {
       requesterUserId,
     };
 
-    //
+    //TODO DB Transaction : Start here
+    await User.increment("blockedCredits", {
+      by: creditsNeeded,
+      where: { id: requesterUserId },
+    });
     await Reservation.create(newReservation);
+    //TODO DB Transaction : End here
+
+    newReservation.creditsCost = creditsNeeded;
+
     console.log("new rez. object", newReservation);
     res.send(newReservation);
   } catch (e) {
