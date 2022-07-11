@@ -10,6 +10,26 @@ const {
   REV_STATUS_ACCEPTED,
 } = require("../config/constants");
 
+const calculateCredits = (startDate, endDate) => {
+  if (!startDate || !endDate) {
+    return 0;
+  }
+
+  const sDate = new Date(startDate);
+  const eDate = new Date(endDate);
+
+  const diffTime = eDate - sDate;
+  if (diffTime < 0) {
+    return 0;
+  }
+
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  console.log(eDate, "-", sDate, "=", diffDays);
+  return diffDays + 1;
+};
+
+//GET ALL REZ.
+
 router.get("/", async (req, res, next) => {
   try {
     const reservations = await Reservation.findAll({
@@ -28,6 +48,8 @@ router.get("/", async (req, res, next) => {
     next(e);
   }
 });
+
+// GET MY REZ.
 
 router.get("/mine", authMiddleware, async (req, res, next) => {
   console.log("In mine reservations");
@@ -71,6 +93,8 @@ router.get("/mine", authMiddleware, async (req, res, next) => {
   }
 });
 
+// GET REZ. DETAILS
+
 router.get("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -88,7 +112,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// new reservation post /reservations
+// NEW REZ. - POST
 router.post("/", authMiddleware, async (req, res, next) => {
   try {
     const user = req.user;
@@ -98,7 +122,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
       return res.status(401).send("You need to login");
     }
 
-    const requesterUserId = parseInt(user.id);
+    const requesterUserId = user.id;
     console.log("requester id ", requesterUserId);
 
     const { startDate, endDate, description, longitude, latitude, imageUrl } =
@@ -115,6 +139,19 @@ router.post("/", authMiddleware, async (req, res, next) => {
       console.log("Please find your location on the map");
       return res.status(400).send("Please find your location on the map");
     }
+
+    const creditsNeeded = calculateCredits(startDate, endDate);
+    if (user.credits < creditsNeeded) {
+      console.log(
+        `User tried to spend ${creditsNeeded} but has only ${user.credits}.`
+      );
+      return res.status(400).send("Your credits are not enough.");
+    } else {
+      console.log(
+        `User will  spend ${creditsNeeded} from ${user.credits} credits.`
+      );
+    }
+
     const newReservation = {
       startDate,
       endDate,
@@ -126,6 +163,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
       requesterUserId,
     };
 
+    //
     await Reservation.create(newReservation);
     console.log("new rez. object", newReservation);
     res.send(newReservation);
@@ -135,7 +173,8 @@ router.post("/", authMiddleware, async (req, res, next) => {
   }
 });
 
-// for reservation accepting
+// ACCEPT REZ.
+
 router.post("/:id/accept", authMiddleware, async (req, res, next) => {
   try {
     const user = req.user;
