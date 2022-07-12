@@ -1,4 +1,5 @@
 const CronJob = require("node-cron");
+const moment = require("moment");
 
 const updateExpiredReservations = () => {
   try {
@@ -11,6 +12,18 @@ const updateExpiredReservations = () => {
 
 const updateCompletedReservations = () => {
   try {
+    // get the reservations that are accepted
+    // see how long ago they finished
+    // if > 1 day =>
+    // make transaction between accounts
+    // change status to completed
+
+    // const fakeStartDate = moment(r.startDate);
+    // const now = moment();
+
+    // const diff = now.diff(fakeStartDate, "days");
+    // console.log("days diff", diff);
+
     console.log("Updating status of completed reservations");
     //todo
   } catch (error) {
@@ -21,9 +34,9 @@ const updateCompletedReservations = () => {
 exports.initScheduledJobs = () => {
   //Everyday at 15:00 see https://crontab.cronhub.io/ //* * * * *
   //const scheduledJobFunction = CronJob.schedule("0 15 * * *", () => {
-  const statusScheduler = CronJob.schedule("* * * * *", () => {
-    updateExpiredReservations();
+  const statusScheduler = CronJob.schedule("1,30 * * * * *", () => {
     updateCompletedReservations();
+    updateExpiredReservations();
 
     // const diffDays = (date) => {
     //   let today = new Date();

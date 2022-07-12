@@ -143,7 +143,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
       return res.status(400).send("Please find your location on the map");
     }
 
-    // CHECK CREDITS
+    // CHECK TS
     const creditsNeeded = calculateCredits(startDate, endDate);
     const availableCredits = user.credits - user.blockedCredits;
     if (availableCredits < creditsNeeded) {
@@ -213,7 +213,7 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
       { where: { id: reservationId } }
     );
 
-    res.send(result);
+    res.send({ reservationId, status: REV_STATUS_ACCEPTED });
   } catch (e) {
     console.log(e.message);
     next(e);
