@@ -11,12 +11,14 @@ const {
   REV_STATUS_ACCEPTED,
 } = require("../config/constants");
 
+// CALCULATE CREDITS
 const calculateCredits = (startDate, endDate) => {
   if (!startDate || !endDate) {
     return 0;
   }
 
   const sDate = new Date(startDate);
+  console.log("start date is changes in date format", sDate);
   const eDate = new Date(endDate);
 
   const diffTime = eDate - sDate;
@@ -141,6 +143,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
       return res.status(400).send("Please find your location on the map");
     }
 
+    // CHECK CREDITS
     const creditsNeeded = calculateCredits(startDate, endDate);
     const availableCredits = user.credits - user.blockedCredits;
     if (availableCredits < creditsNeeded) {
@@ -165,13 +168,13 @@ router.post("/", authMiddleware, async (req, res, next) => {
       requesterUserId,
     };
 
-    //TODO DB Transaction : Start here
+    //DB Transaction : Start here
     await User.increment("blockedCredits", {
       by: creditsNeeded,
       where: { id: requesterUserId },
     });
     await Reservation.create(newReservation);
-    //TODO DB Transaction : End here
+    // DB Transaction : End here
 
     newReservation.creditsCost = creditsNeeded;
 

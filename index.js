@@ -1,7 +1,7 @@
 //packages
 const express = require("express");
 const corsMiddleWare = require("cors");
-
+const { initScheduledJobs } = require("./scheduled/statusScheduler");
 //routers
 const authRouter = require("./routers/auth");
 const reservationRouter = require("./routers/reservations");
@@ -23,7 +23,7 @@ app.use(express.json());
 //routes
 app.use("/auth", authRouter);
 app.use("/reservations", reservationRouter);
-
+initScheduledJobs();
 //start listening
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
