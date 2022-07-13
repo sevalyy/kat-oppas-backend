@@ -16,7 +16,7 @@ module.exports = {
           updatedAt: new Date(),
           aboutMe: "",
           credits: 5,
-          blockedCredits: 0,
+          blockedCredits: 3,
         },
         {
           name: "Bo",
@@ -28,7 +28,7 @@ module.exports = {
           aboutMe: "",
 
           credits: 5,
-          blockedCredits: 0,
+          blockedCredits: 4,
         },
         {
           name: "Celine",
@@ -40,7 +40,7 @@ module.exports = {
           aboutMe: "",
 
           credits: 5,
-          blockedCredits: 0,
+          blockedCredits: 1,
         },
       ],
       {}

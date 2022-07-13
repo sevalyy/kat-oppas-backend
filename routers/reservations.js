@@ -174,13 +174,22 @@ router.post("/", authMiddleware, async (req, res, next) => {
       by: creditsNeeded,
       where: { id: requesterUserId },
     });
-    await Reservation.create(newReservation);
+    const createdReservation = await Reservation.create(newReservation);
     // DB Transaction : End here
 
-    newReservation.creditsCost = creditsNeeded;
+    const reservationWithData = await Reservation.findByPk(
+      createdReservation.id,
+      {
+        include: [
+          { model: User, as: "requester" },
+          { model: User, as: "provider" },
+          Transaction,
+        ],
+      }
+    );
 
-    console.log("new rez. object", newReservation);
-    res.send(newReservation);
+    console.log("new rez. object", reservationWithData);
+    res.send(reservationWithData);
   } catch (e) {
     console.log("Error for new rez. :", e.message);
     next(e);
@@ -251,10 +260,9 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
     ) {
       return res.status(403).send("You are not authorized.");
     }
-
+    const isRequesterCancelling = reservation.requesterUserId === userId;
     if (reservation.status === REV_STATUS_ACCEPTED) {
-      const isRequesterCancelling = reservation.requesterUserId === userId;
-
+      //DB Transaction : Start here
       // update reservation by cancel button
       const rowsEffected = await Reservation.update(
         // update 2 fields at the same time
@@ -267,6 +275,17 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
         { where: { id: reservationId } }
       );
 
+      if (isRequesterCancelling) {
+        const creditsUnblocked = calculateCredits(
+          reservation.startDate,
+          reservation.endDate
+        );
+        await User.decrement("blockedCredits", {
+          by: creditsUnblocked,
+          where: { id: userId },
+        });
+      }
+      // DB Transaction : End here
       console.log("rows effected", rowsEffected, "will load", reservationId);
     }
 
@@ -278,6 +297,7 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
         Transaction,
       ],
     });
+
     console.log("canceled reservation by provider returns", updatedReservation);
     res.send(updatedReservation);
   } catch (e) {

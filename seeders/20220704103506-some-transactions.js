@@ -7,7 +7,7 @@ module.exports = {
       [
         {
           reason: "2 days oppas",
-          transferedCredits: 2,
+          transferedCredits: 3,
           transactionTime: "2022-08-19",
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -17,8 +17,8 @@ module.exports = {
         },
         {
           reason: "10 days oppas",
-          transferedCredits: 10,
-          transactionTime: "2022-07-27",
+          transferedCredits: 1,
+          transactionTime: "2022-07-17",
           createdAt: new Date(),
           updatedAt: new Date(),
           reservationId: 2,
@@ -26,9 +26,9 @@ module.exports = {
           toUserId: 1,
         },
         {
-          reason: "5 days oppas",
-          transferedCredits: 5,
-          transactionTime: "2022-08-15",
+          reason: "4 days oppas",
+          transferedCredits: 4,
+          transactionTime: "2022-08-13",
           createdAt: new Date(),
           updatedAt: new Date(),
           reservationId: 3,
