@@ -10,6 +10,7 @@ const {
   REV_STATUS_CREATED,
   REV_STATUS_ACCEPTED,
   REV_STATUS_CANCELLED,
+  REV_STATUS_COMPLETED,
 } = require("../config/constants");
 
 // CALCULATE CREDITS
@@ -309,6 +310,72 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
     });
 
     console.log("canceled reservation by provider returns", updatedReservation);
+    res.send(updatedReservation);
+  } catch (e) {
+    console.log(e.message);
+    next(e);
+  }
+});
+
+// APPROVE REZ.
+
+router.post("/:id/approve", authMiddleware, async (req, res, next) => {
+  try {
+    const user = req.user;
+    console.log("requester to approve ", user);
+
+    if (!user) {
+      return res.status(401).send("You need to login");
+    }
+
+    const requesterUserId = user.id;
+    console.log("requester id ", requesterUserId);
+
+    const reservationId = req.params.id;
+    console.log(reservationId, "this is reservationId ");
+    const reservation = await Reservation.findByPk(reservationId);
+
+    if (requesterUserId !== reservation.requesterUserId) {
+      return res.status(403).send("Only requester can approve");
+    }
+    if (reservation.status !== REV_STATUS_ACCEPTED) {
+      return res.status(400).send("This reservation is not accepted");
+    }
+    // update reservation by approve button
+    await Reservation.update(
+      // update 2 fields at the same time
+      { status: REV_STATUS_COMPLETED },
+      { where: { id: reservationId } }
+    );
+    const credits = calculateCredits(
+      reservation.startDate,
+      reservation.endDate
+    );
+
+    // decrease credits and blocked credits of requester
+    // increase provider credits
+    await User.decrement("credits", {
+      by: credits,
+      where: { id: reservation.requesterUserId },
+    });
+    await User.decrement("blockedCredits", {
+      by: credits,
+      where: { id: reservation.requesterUserId },
+    });
+    await User.increment("credits", {
+      by: credits,
+      where: { id: reservation.providerUserId },
+    });
+
+    //find updated reservation
+    const updatedReservation = await Reservation.findByPk(reservationId, {
+      include: [
+        { model: User, as: "requester" },
+        { model: User, as: "provider" },
+        Transaction,
+      ],
+    });
+    console.log("completed reservation returns", updatedReservation);
     res.send(updatedReservation);
   } catch (e) {
     console.log(e.message);
