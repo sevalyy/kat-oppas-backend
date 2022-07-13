@@ -3,18 +3,15 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class transaction extends Model {
     static associate(models) {
-      transaction.belongsTo(models.reservation, {
+      transaction.belongsTo(models.user, {
         foreignKey: "reservationId",
       });
-      // not ok // transaction.hasOne(models.user, { foreignKey: "fromUserId" });
-      // not ok // transaction.hasOne(models.user, { foreignKey: "toUserId" });
     }
   }
   transaction.init(
     {
       reason: DataTypes.STRING,
-      transferedCredits: DataTypes.INTEGER,
-      transactionTime: DataTypes.DATEONLY,
+      creditsChange: DataTypes.INTEGER,
     },
     {
       sequelize,

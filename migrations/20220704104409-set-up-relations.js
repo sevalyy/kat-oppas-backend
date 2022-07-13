@@ -31,24 +31,6 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       }),
-      queryInterface.addColumn("transactions", "fromUserId", {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
-      }),
-      queryInterface.addColumn("transactions", "toUserId", {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
-      }),
     ];
   },
 
@@ -57,8 +39,6 @@ module.exports = {
       queryInterface.removeColumn("reservations", "requesterUserId"),
       queryInterface.removeColumn("transactions", "reservationId"),
       queryInterface.removeColumn("reservations", "providerUserId"),
-      queryInterface.removeColumn("transactions", "fromUserId"),
-      // queryInterface.removeColumn("transactions", "toUserId"),
     ];
   },
 };

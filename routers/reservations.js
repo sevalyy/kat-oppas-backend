@@ -175,6 +175,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
       by: creditsNeeded,
       where: { id: requesterUserId },
     });
+
     const createdReservation = await Reservation.create(newReservation);
     // DB Transaction : End here
 
@@ -365,6 +366,11 @@ router.post("/:id/approve", authMiddleware, async (req, res, next) => {
     await User.increment("credits", {
       by: credits,
       where: { id: reservation.providerUserId },
+    });
+    await Transaction.create({
+      reservationId,
+      reason: `Approve by user-${reservation.requesterUserId} to user-${reservation.providerUserId}`,
+      creditsChange: credits,
     });
 
     //find updated reservation
