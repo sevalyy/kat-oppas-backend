@@ -261,7 +261,17 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
       return res.status(403).send("You are not authorized.");
     }
     const isRequesterCancelling = reservation.requesterUserId === userId;
-    if (reservation.status === REV_STATUS_ACCEPTED) {
+    console.log(
+      userId,
+      "is cancelling",
+      reservationId,
+      " and is owner:",
+      isRequesterCancelling ? "yes" : "no"
+    );
+    if (
+      reservation.status === REV_STATUS_ACCEPTED ||
+      (isRequesterCancelling && reservation.status == REV_STATUS_CREATED)
+    ) {
       //DB Transaction : Start here
       // update reservation by cancel button
       const rowsEffected = await Reservation.update(
