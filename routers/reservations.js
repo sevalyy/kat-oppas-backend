@@ -201,19 +201,28 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
     console.log("provider id ", providerUserId);
 
     const reservationId = req.params.id;
+    console.log(reservationId, "rez. id ne geliyor");
     const reservation = await Reservation.findByPk(reservationId);
 
     if (reservation.status !== REV_STATUS_CREATED) {
       return res.status(400).send("This reservation is already accepted");
     }
     // update reservation by accepting button
-    const result = await Reservation.update(
+    await Reservation.update(
       // update 2 fields at the same time
       { providerUserId: providerUserId, status: REV_STATUS_ACCEPTED },
       { where: { id: reservationId } }
     );
-
-    res.send({ reservationId, status: REV_STATUS_ACCEPTED });
+    //find updated reservation
+    const updatedReservation = await Reservation.findByPk(reservationId, {
+      include: [
+        { model: User, as: "requester" },
+        { model: User, as: "provider" },
+        Transaction,
+      ],
+    });
+    console.log("Accept reservation returns", updatedReservation);
+    res.send(updatedReservation);
   } catch (e) {
     console.log(e.message);
     next(e);

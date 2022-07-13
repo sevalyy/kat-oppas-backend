@@ -32,9 +32,9 @@ const updateCompletedReservations = () => {
 };
 
 exports.initScheduledJobs = () => {
-  //Everyday at 15:00 see https://crontab.cronhub.io/ //* * * * *
+  //Everyday at 15:00 see https://crontab.cronhub.io/ //1,30 * * * * *
   //const scheduledJobFunction = CronJob.schedule("0 15 * * *", () => {
-  const statusScheduler = CronJob.schedule("1,30 * * * * *", () => {
+  const statusScheduler = CronJob.schedule("0 15 * * *", () => {
     updateCompletedReservations();
     updateExpiredReservations();
 
