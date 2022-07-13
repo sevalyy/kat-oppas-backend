@@ -9,6 +9,7 @@ const { Op } = require("sequelize");
 const {
   REV_STATUS_CREATED,
   REV_STATUS_ACCEPTED,
+  REV_STATUS_CANCELLED,
 } = require("../config/constants");
 
 // CALCULATE CREDITS
@@ -201,7 +202,7 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
     console.log("provider id ", providerUserId);
 
     const reservationId = req.params.id;
-    console.log(reservationId, "rez. id ne geliyor");
+    console.log(reservationId, "this is reservationId ");
     const reservation = await Reservation.findByPk(reservationId);
 
     if (reservation.status !== REV_STATUS_CREATED) {
@@ -222,6 +223,62 @@ router.post("/:id/accept", authMiddleware, async (req, res, next) => {
       ],
     });
     console.log("Accept reservation returns", updatedReservation);
+    res.send(updatedReservation);
+  } catch (e) {
+    console.log(e.message);
+    next(e);
+  }
+});
+
+// CANCEL REZ.
+router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).send("You need to login");
+    }
+
+    const userId = user.id;
+    // const requesterUserId = user.id;
+
+    const reservationId = req.params.id;
+    const reservation = await Reservation.findByPk(reservationId);
+
+    if (
+      reservation.providerUserId !== userId &&
+      reservation.requesterUserId !== userId
+    ) {
+      return res.status(403).send("You are not authorized.");
+    }
+
+    if (reservation.status === REV_STATUS_ACCEPTED) {
+      const isRequesterCancelling = reservation.requesterUserId === userId;
+
+      // update reservation by cancel button
+      const rowsEffected = await Reservation.update(
+        // update 2 fields at the same time
+        {
+          providerUserId: null,
+          status: isRequesterCancelling
+            ? REV_STATUS_CANCELLED
+            : REV_STATUS_CREATED,
+        },
+        { where: { id: reservationId } }
+      );
+
+      console.log("rows effected", rowsEffected, "will load", reservationId);
+    }
+
+    //find updated reservation
+    const updatedReservation = await Reservation.findByPk(reservationId, {
+      include: [
+        { model: User, as: "requester" },
+        { model: User, as: "provider" },
+        Transaction,
+      ],
+    });
+    console.log("canceled reservation by provider returns", updatedReservation);
     res.send(updatedReservation);
   } catch (e) {
     console.log(e.message);
