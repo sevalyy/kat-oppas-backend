@@ -146,20 +146,6 @@ exports.initScheduledJobs = () => {
     //const statusScheduler = CronJob.schedule("0 23 * * *", () => {
     updateCompletedReservations();
     updateExpiredReservations();
-
-    // const diffDays = (date) => {
-    //   let today = new Date();
-    //   let expire = new Date(date);
-    //   let difference = new Date(expire).getTime() - new Date(today).getTime();
-    //   return difference / (1000 * 3600 * 24);
-    // };
-    // 1. STATUS CHANGES
-    // if(diffDays(r.startDate)<=0)(
-    //   r.status==="expired"
-    // )
-
-    // 2. BLOCKED CREDIT BACK
-    //
   });
   console.log("Scheduler scheduled.");
   statusScheduler.start();

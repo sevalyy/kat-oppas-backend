@@ -13,7 +13,7 @@ const {
   REV_STATUS_COMPLETED,
 } = require("../config/constants");
 
-// seq for transactions ////
+// seq. for transactions ////
 const { sequelize } = require("../models/");
 
 // CALCULATE CREDITS
@@ -172,14 +172,22 @@ router.post("/", authMiddleware, async (req, res, next) => {
       status: REV_STATUS_CREATED,
       requesterUserId,
     };
+    const t = await sequelize.transaction();
 
     //DB Transaction : Start here
-    await User.increment("blockedCredits", {
-      by: creditsNeeded,
-      where: { id: requesterUserId },
-    });
+    await User.increment(
+      "blockedCredits",
+      {
+        by: creditsNeeded,
+        where: { id: requesterUserId },
+      },
+      { transaction: t }
+    );
 
-    const createdReservation = await Reservation.create(newReservation);
+    const createdReservation = await Reservation.create(newReservation, {
+      transaction: t,
+    });
+    await t.commit();
     // DB Transaction : End here
 
     const reservationWithData = await Reservation.findByPk(
@@ -197,6 +205,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
     res.send(reservationWithData);
   } catch (e) {
     console.log("Error for new rez. :", e.message);
+    await t.rollback();
     next(e);
   }
 });
@@ -278,6 +287,7 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
       (isRequesterCancelling && reservation.status == REV_STATUS_CREATED)
     ) {
       //DB Transaction : Start here
+      const t = await sequelize.transaction();
       // update reservation by cancel button
       const rowsEffected = await Reservation.update(
         // update 2 fields at the same time
@@ -287,7 +297,8 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
             ? REV_STATUS_CANCELLED
             : REV_STATUS_CREATED,
         },
-        { where: { id: reservationId } }
+        { where: { id: reservationId } },
+        { transaction: t }
       );
 
       if (isRequesterCancelling) {
@@ -295,11 +306,16 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
           reservation.startDate,
           reservation.endDate
         );
-        await User.decrement("blockedCredits", {
-          by: creditsUnblocked,
-          where: { id: userId },
-        });
+        await User.decrement(
+          "blockedCredits",
+          {
+            by: creditsUnblocked,
+            where: { id: userId },
+          },
+          { transaction: t }
+        );
       }
+      await t.commit();
       // DB Transaction : End here
       console.log("rows effected", rowsEffected, "will load", reservationId);
     }
@@ -317,6 +333,7 @@ router.post("/:id/cancel", authMiddleware, async (req, res, next) => {
     res.send(updatedReservation);
   } catch (e) {
     console.log(e.message);
+    await t.rollback();
     next(e);
   }
 });
