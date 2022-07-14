@@ -13,6 +13,9 @@ const {
   REV_STATUS_COMPLETED,
 } = require("../config/constants");
 
+// seq for transactions ////
+const { sequelize } = require("../models/");
+
 // CALCULATE CREDITS
 const calculateCredits = (startDate, endDate) => {
   if (!startDate || !endDate) {
@@ -353,25 +356,45 @@ router.post("/:id/approve", authMiddleware, async (req, res, next) => {
       reservation.endDate
     );
 
+    const t = await sequelize.transaction();
+
     // decrease credits and blocked credits of requester
     // increase provider credits
-    await User.decrement("credits", {
-      by: credits,
-      where: { id: reservation.requesterUserId },
-    });
-    await User.decrement("blockedCredits", {
-      by: credits,
-      where: { id: reservation.requesterUserId },
-    });
-    await User.increment("credits", {
-      by: credits,
-      where: { id: reservation.providerUserId },
-    });
-    await Transaction.create({
-      reservationId,
-      reason: `Approve by user-${reservation.requesterUserId} to user-${reservation.providerUserId}`,
-      creditsChange: credits,
-    });
+    await User.decrement(
+      "credits",
+      {
+        by: credits,
+        where: { id: reservation.requesterUserId },
+      },
+      { transaction: t }
+    );
+    await User.decrement(
+      "blockedCredits",
+      {
+        by: credits,
+        where: { id: reservation.requesterUserId },
+      },
+      { transaction: t }
+    );
+    await User.increment(
+      "credits",
+      {
+        by: credits,
+        where: { id: reservation.providerUserId },
+      },
+      { transaction: t }
+    );
+
+    await Transaction.create(
+      {
+        reservationId,
+        reason: `Approve by user-${reservation.requesterUserId} to user-${reservation.providerUserId}`,
+        creditsChange: credits,
+      },
+      { transaction: t }
+    );
+
+    await t.commit();
 
     //find updated reservation
     const updatedReservation = await Reservation.findByPk(reservationId, {
@@ -385,6 +408,7 @@ router.post("/:id/approve", authMiddleware, async (req, res, next) => {
     res.send(updatedReservation);
   } catch (e) {
     console.log(e.message);
+    await t.rollback();
     next(e);
   }
 });
