@@ -3,7 +3,7 @@ const moment = require("moment");
 const Reservation = require("../models/").reservation;
 const User = require("../models/").user;
 const Transaction = require("../models/").transaction;
-
+const { sequelize } = require("../models/");
 const { Op } = require("sequelize");
 const {
   REV_STATUS_CREATED,
@@ -34,49 +34,90 @@ const calculateCredits = (startDate, endDate) => {
 };
 
 const setReservationExpire = async (reservation) => {
-  await Reservation.update(
-    // update 2 fields at the same time
-    { status: REV_STATUS_EXPIRED },
-    { where: { id: reservation.id } }
-  );
+  const t = await sequelize.transaction();
 
-  const requestUserId = reservation.requesterUserId;
-  const unblock = calculateCredits(reservation.startDate, reservation.endDate);
+  try {
+    await Reservation.update(
+      // update 2 fields at the same time
+      { status: REV_STATUS_EXPIRED },
+      { where: { id: reservation.id } },
+      { transaction: t }
+    );
 
-  await User.decrement("blockedCredits", {
-    by: unblock,
-    where: { id: requestUserId },
-  });
+    const requestUserId = reservation.requesterUserId;
+    const unblock = calculateCredits(
+      reservation.startDate,
+      reservation.endDate
+    );
+
+    await User.decrement(
+      "blockedCredits",
+      {
+        by: unblock,
+        where: { id: requestUserId },
+      },
+      { transaction: t }
+    );
+    t.commit();
+  } catch (error) {
+    t.rollback();
+  }
 };
 
 const setReservatioComplete = async (reservation) => {
-  await Reservation.update(
-    // update 2 fields at the same time
-    { status: REV_STATUS_COMPLETED },
-    { where: { id: reservation.id } }
-  );
+  const t = await sequelize.transaction();
+  try {
+    await Reservation.update(
+      // update 2 fields at the same time
+      { status: REV_STATUS_COMPLETED },
+      { where: { id: reservation.id } },
+      { transaction: t }
+    );
 
-  const requestUserId = reservation.requesterUserId;
-  const unblock = calculateCredits(reservation.startDate, reservation.endDate);
-  console.log("Will do change of " + unblock + " to id " + reservation.id);
-  //TODO re-use logic from reservations route??
-  await User.decrement("blockedCredits", {
-    by: unblock,
-    where: { id: requestUserId },
-  });
-  await User.decrement("credits", {
-    by: unblock,
-    where: { id: requestUserId },
-  });
-  await User.increment("credits", {
-    by: unblock,
-    where: { id: reservation.providerUserId },
-  });
-  await Transaction.create({
-    reservation: reservation.id,
-    reason: `AUTO Approve: user-${reservation.requesterUserId} to user-${reservation.providerUserId}`,
-    creditsChange: unblock,
-  });
+    const requestUserId = reservation.requesterUserId;
+    const unblock = calculateCredits(
+      reservation.startDate,
+      reservation.endDate
+    );
+    console.log("Will do change of " + unblock + " to id " + reservation.id);
+    //TODO re-use logic from reservations route??
+    await User.decrement(
+      "blockedCredits",
+      {
+        by: unblock,
+        where: { id: requestUserId },
+      },
+      { transaction: t }
+    );
+    await User.decrement(
+      "credits",
+      {
+        by: unblock,
+        where: { id: requestUserId },
+      },
+      { transaction: t }
+    );
+    await User.increment(
+      "credits",
+      {
+        by: unblock,
+        where: { id: reservation.providerUserId },
+      },
+      { transaction: t }
+    );
+    await Transaction.create(
+      {
+        reservationId: reservation.id,
+        reason: `AUTO Approve: user-${reservation.requesterUserId} to user-${reservation.providerUserId}`,
+        creditsChange: unblock,
+      },
+      { transaction: t }
+    );
+    t.commit;
+  } catch (error) {
+    console.log(error);
+    t.rollback();
+  }
 };
 
 const updateExpiredReservations = async () => {
@@ -139,11 +180,12 @@ const updateCompletedReservations = async () => {
   }
 };
 
+//for frequancy, see  https://crontab.cronhub.io/
 exports.initScheduledJobs = () => {
-  //Every 15 seconds
-  const statusScheduler = CronJob.schedule("0/15 * * * * *", () => {
-    //Everyday at 23:00 see https://crontab.cronhub.io/ //1,30 * * * * *
-    //const statusScheduler = CronJob.schedule("0 23 * * *", () => {
+  // every minute. if you need quik test, use this one
+  // const statusScheduler = CronJob.schedule("* * * * *", () => {
+  // everyday at 21:00
+  const statusScheduler = CronJob.schedule("0 21 * * *", () => {
     updateCompletedReservations();
     updateExpiredReservations();
   });
