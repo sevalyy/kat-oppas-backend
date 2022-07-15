@@ -58,9 +58,10 @@ const setReservationExpire = async (reservation) => {
       },
       { transaction: t }
     );
-    t.commit();
+    await t.commit();
   } catch (error) {
-    t.rollback();
+    console.log(error);
+    await t.rollback();
   }
 };
 
@@ -113,10 +114,10 @@ const setReservatioComplete = async (reservation) => {
       },
       { transaction: t }
     );
-    t.commit;
+    await t.commit();
   } catch (error) {
     console.log(error);
-    t.rollback();
+    await t.rollback();
   }
 };
 
@@ -172,7 +173,7 @@ const updateCompletedReservations = async () => {
     });
 
     reservations.forEach((r) => {
-      console.log("We will expire status of " + r.id);
+      console.log("We will update status of " + r.id);
       setReservatioComplete(r);
     });
   } catch (error) {
@@ -183,9 +184,9 @@ const updateCompletedReservations = async () => {
 //for frequancy, see  https://crontab.cronhub.io/
 exports.initScheduledJobs = () => {
   // every minute. if you need quik test, use this one
-  // const statusScheduler = CronJob.schedule("* * * * *", () => {
-  // everyday at 21:00
-  const statusScheduler = CronJob.schedule("0 21 * * *", () => {
+  const statusScheduler = CronJob.schedule("* * * * *", () => {
+    // everyday at 21:00
+    // const statusScheduler = CronJob.schedule("0 21 * * *", () => {
     updateCompletedReservations();
     updateExpiredReservations();
   });
