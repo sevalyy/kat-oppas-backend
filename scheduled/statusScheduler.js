@@ -177,7 +177,7 @@ const updateCompletedReservations = async () => {
       setReservatioComplete(r);
     });
   } catch (error) {
-    console.log("updateCompletedReservations failed", error);
+    console.log("updateCompletedReservations failed!", error);
   }
 };
 
@@ -187,8 +187,8 @@ exports.initScheduledJobs = () => {
   const statusScheduler = CronJob.schedule("* * * * *", () => {
     // everyday at 21:00
     // const statusScheduler = CronJob.schedule("0 21 * * *", () => {
-    updateCompletedReservations();
-    updateExpiredReservations();
+    // updateCompletedReservations();
+    //updateExpiredReservations();
   });
   console.log("Scheduler scheduled.");
   statusScheduler.start();
