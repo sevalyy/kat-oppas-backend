@@ -184,11 +184,11 @@ const updateCompletedReservations = async () => {
 //for frequancy, see  https://crontab.cronhub.io/
 exports.initScheduledJobs = () => {
   // every minute. if you need quik test, use this one
-  const statusScheduler = CronJob.schedule("* * * * *", () => {
-    // everyday at 21:00
-    // const statusScheduler = CronJob.schedule("0 21 * * *", () => {
-    // updateCompletedReservations();
-    //updateExpiredReservations();
+  // const statusScheduler = CronJob.schedule("* * * * *", () => {
+  // everyday at 21:00
+  const statusScheduler = CronJob.schedule("0 21 * * *", () => {
+    updateCompletedReservations();
+    updateExpiredReservations();
   });
   console.log("Scheduler scheduled.");
   statusScheduler.start();

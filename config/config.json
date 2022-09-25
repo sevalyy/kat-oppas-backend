@@ -1,6 +1,5 @@
 {
   "development": {
-    "url": "postgres://dqkcneno:lAK7A8bvJdji_jk_fwV03sWcHulTgrUQ@abul.db.elephantsql.com/dqkcneno",
     "dialect": "postgres",
     "pool": {
       "max": 2,
@@ -10,7 +9,6 @@
     }
   },
   "test": {
-    "url": "postgres://dqkcneno:lAK7A8bvJdji_jk_fwV03sWcHulTgrUQ@abul.db.elephantsql.com/dqkcneno",
     "dialect": "postgres",
     "pool": {
       "max": 2,
@@ -20,7 +18,6 @@
     }
   },
   "production": {
-    "url": "postgres://dqkcneno:lAK7A8bvJdji_jk_fwV03sWcHulTgrUQ@abul.db.elephantsql.com/dqkcneno",
     "dialect": "postgres",
     "pool": {
       "max": 2,
