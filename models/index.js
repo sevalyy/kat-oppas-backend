@@ -7,7 +7,6 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.json")[env];
 const db = {};
-console.log("url is", process.env);
 let sequelize = new Sequelize(process.env.POSTGRES_URL, config);
 
 fs.readdirSync(__dirname)
